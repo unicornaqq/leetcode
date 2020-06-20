@@ -49,7 +49,9 @@ class Solution:
         else:
             return (nums1[0] + nums2[0])/2
 
+solution = Solution()
 nums1 = [1, 2, 3, 5, 10]
 nums2 = [3, 4]
-solution = Solution()
-print(solution.findMedianSortedArrays(nums1, nums2))
+result = solution.findMedianSortedArrays(nums1, nums2)
+print(result)
+assert result == 5
