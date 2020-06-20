@@ -55,3 +55,4 @@ nums2 = [3, 4]
 result = solution.findMedianSortedArrays(nums1, nums2)
 print(result)
 assert result == 5
+
