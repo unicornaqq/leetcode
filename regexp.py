@@ -2,7 +2,8 @@ import sys
 
 
 (_, string, pattern, expected_result) = (None, None, None, None)
-(_, string, pattern, expected_result) = sys.argv[:]
+if len(sys.argv) == 4:
+    (_, string, pattern, expected_result) = sys.argv[:]
 
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
@@ -52,11 +53,21 @@ class Solution:
                 if precedence != None:
                     if precedence == ".":
                         """ not always true, for example:
-                        string "abc", pattern "a.*b"
+                        string "afoeoefoeojb", pattern "a.*b"
                         How to handle this case. """
-                        # TODO
-                        
-                        return True
+                        if j == len(p) - 1:
+                            return True
+                        else:
+                            # pattern like a.*b
+                            # TODO
+                            # how about the pattern a.*b.*c
+                            jump = s[i:].find(p[j+1])
+                            if jump != -1:
+                                i = i + jump
+                                j += 1
+                                continue
+                            else:
+                                return False
                     elif precedence == s[i]:
                         i+=1
                         continue
@@ -85,7 +96,8 @@ if expected_result == None:
         ("aab", True),
         ("a.b", True),
         ("c*a*b", True), #TODO
-        ("a.*c", False) #TODO
+        ("a.*c", False), 
+        ("a.*b.*c", False) #TODO
     ])
     for (k, v) in test_map.items():
         print(k)
