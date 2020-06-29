@@ -1,3 +1,9 @@
+import sys
+
+
+(_, string, pattern, expected_result) = (None, None, None, None)
+(_, string, pattern, expected_result) = sys.argv[:]
+
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
         
@@ -48,6 +54,7 @@ class Solution:
                         """ not always true, for example:
                         string "abc", pattern "a.*b"
                         How to handle this case. """
+                        # TODO
                         
                         return True
                     elif precedence == s[i]:
@@ -67,21 +74,27 @@ class Solution:
                 return False
         
         return result           
-                
-to_match = "aab"
+
 solution = Solution()
-test_map = dict([
-    ("a.*b", True),
-    ("a***b", True),
-    ("aab", True),
-    ("a.b", True),
-    ("c*a*b", True),
-    ("a.*c", False)
-])
-for (k, v) in test_map.items():
-    print(k)
-    try:
-        assert (solution.isMatch(to_match, k)) == v
-    except AssertionError as error:
-        print("case with pattern {} failed".format(k))
+if expected_result == None:                
+    to_match = "aab"
     
+    test_map = dict([
+        ("a.*b", True),
+        ("a***b", True),
+        ("aab", True),
+        ("a.b", True),
+        ("c*a*b", True), #TODO
+        ("a.*c", False) #TODO
+    ])
+    for (k, v) in test_map.items():
+        print(k)
+        try:
+            assert (solution.isMatch(to_match, k)) == v
+        except AssertionError as error:
+            print("case with pattern {} failed".format(k))
+else:
+    try:
+        assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
+    except AssertionError as error:
+        print("case with pattern {} failed".format(pattern))
