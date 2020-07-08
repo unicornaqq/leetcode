@@ -5,7 +5,7 @@ import sys
 if len(sys.argv) == 4:
     (_, string, pattern, expected_result) = sys.argv[:]
 
-DEBUG = 0
+DEBUG = 1
 
 def log(var):
     if DEBUG == 1:
@@ -83,8 +83,21 @@ class Solution:
                             # 0 char. don't need to care about in this 
                             # branch. And it is handled in the exception
                             # handling logic.
+                            
+                            
+                            """ after split the string with *, there could be different
+                            way to match the substring, need to find out which way
+                            is the right match, and then based on that match method to figure out
+                            the offset and roffset of the whole substring containning *.
+                            for the example:
+                                Raw:afafbeeabxxbeeab
+                                Pattern:af*a.*afa.*eab
+                            although [af, a] can match the raw string in different way
+                            but only afa at the head of the string should be the match object.
+                            although, the a can match multiple instance TODO"""
+                            
                             if previous_star_char != '' and (
-                                any([ c != previous_star_char for c in s[previous_star_char_index:star_left_index]]) or 
+                                any([ c != previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
                                 any([ c != previous_star_char for c in s[previous_star_char_rindex:star_right_index]])):
                                 return False 
                         log([star_left_index, star_right_index])
@@ -151,43 +164,45 @@ class Solution:
 
 
 solution = Solution()
-# print(solution.isMatch("aaaab", "a*b")) # the only match case: aaaab vs a*b
-# print(solution.isMatch("afafbeeab", "a.*b"))
-# # for the case below, you can't match the b  after * to the
-# # final b. so how to decide which b should be matched?
-# print(solution.isMatch("afafbeeab", "a.*beeab"))
-# # same case, if we start from back to the front, which a 
-# # should be matched to the a within (a.*)?
-# print(solution.isMatch("afafbeeab", "afa.*beeab"))
-# print(solution.isMatch("afafbeeab", "afa.*beeab"))
-# print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab"))
-# # the beeab definitely should match the last beeab in
-# # the origianl string
-# print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab.*b"))
-# print(solution.isMatch("afafbeeabxxbeeab", "ada.*beeab.*b"))
+# # print(solution.isMatch("aaaab", "a*b")) # the only match case: aaaab vs a*b
+# # print(solution.isMatch("afafbeeab", "a.*b"))
+# # # for the case below, you can't match the b  after * to the
+# # # final b. so how to decide which b should be matched?
+# # print(solution.isMatch("afafbeeab", "a.*beeab"))
+# # # same case, if we start from back to the front, which a 
+# # # should be matched to the a within (a.*)?
+# # print(solution.isMatch("afafbeeab", "afa.*beeab"))
+# # print(solution.isMatch("afafbeeab", "afa.*beeab"))
+# # print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab"))
+# # # the beeab definitely should match the last beeab in
+# # # the origianl string
+# # print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab.*b"))
+# # print(solution.isMatch("afafbeeabxxbeeab", "ada.*beeab.*b"))
 
-if expected_result == None:                
-    to_match = "aab"
+# if expected_result == None:                
+#     to_match = "aab"
     
-    test_map = dict([
-        ("a.*b", True),
-        ("a***b", True),
-        ("aab", True),
-        ("a.b", True),
-        ("c*a*b", True),
-        ("a.*c", False), 
-        ("a.*b.*c", False)
-    ])
-    for (k, v) in test_map.items():
-        print(k)
-        try:
-            assert (solution.isMatch(to_match, k)) == v
-        except AssertionError as error:
-            print("case with pattern {} failed".format(k))
-else:
-    try:
-        assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
-    except AssertionError as error:
-        print("case with pattern {} failed".format(pattern))
+#     test_map = dict([
+#         ("a.*b", True),
+#         ("a***b", True),
+#         ("aab", True),
+#         ("a.b", True),
+#         ("c*a*b", True),
+#         ("a.*c", False), 
+#         ("a.*b.*c", False)
+#     ])
+#     for (k, v) in test_map.items():
+#         print(k)
+#         try:
+#             assert (solution.isMatch(to_match, k)) == v
+#         except AssertionError as error:
+#             print("case with pattern {} failed".format(k))
+# else:
+#     try:
+#         assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
+#     except AssertionError as error:
+#         print("case with pattern {} failed".format(pattern))
         
-print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) #TODO, think about how to handle the . case
+# print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) #TODO, think about how to handle the . case
+print(solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab"))
+# print(solution.isMatch("afcafcbeeabxxbeeab", "afc.*afc.*eab"))
