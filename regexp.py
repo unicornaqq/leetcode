@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 
 (_, string, pattern, expected_result) = (None, None, None, None)
@@ -6,6 +7,7 @@ if len(sys.argv) == 4:
     (_, string, pattern, expected_result) = sys.argv[:]
 
 DEBUG = 1
+TEST = 0
 
 def log(var):
     if DEBUG == 1:
@@ -138,23 +140,46 @@ class Solution:
                                 else:
                                     # for (dot_index, dot_sub) in enumerate(star_sub):
                                     #     #TODO
+                                    log("the star_sub is {}".format(star_sub))
+                                    # how about the case such as ..a.c.. which starts with . and/or end with ..
+                                    # if  the sub string only contain ., 
+                                    dot_count = star_sub.count('.')
+                                    if dot_count == len(star_sub):
+                                        # . for all
+                                        log("all are dots")
+                                    else:
+                                        # some are alpha, find the index of those alpha                                    
+                                        log("some are alpha")        
                                     return False
             if index == 0:
                 # it is the head
+                # for things at head, the left offset/left_index should at 0
+                # for head, we should use the left_index. 
                 log("it is the head offset={}, roffset={}".format(offset, roffset))
-                if left_index != 0 or (sub.find("*") != -1 and offset != roffset):
+                if left_index != 0:
                     # it doesn't match the head of the string
                     # although it should do. Return 'False' 
                     # directly.
                     return False
-            elif index == len(subStringInP) - 1:
+                # but there is another case, that the pattern only match partial of the string
+                # in this case, the left_index is 0, but it doesn't match. #TODO
+                # maybe, this to do can be handled by change the below elif to if, the head and tail is not excluseive.
+            
+            if index == len(subStringInP) - 1:
+                # for pattern at the end, we should check the right_index instead.
+                # the right_index + string_len, or the roffset should be right
+                # to the end of the raw string
                 log("it is the tail offset={}, roffset={}".format(offset, roffset))
                 if offset != len(s) and roffset != len(s):
                     return False
-            else:
-                log("it is the middle")
+            
+            # else:
+                # for pattern in the middle, it doesn't matter which part of the raw
+                # string deos the pattern match to.
+                # log("it is the middle")
                 # if left_index == 0 or offset == len(s):
                 #     return False
+                
                 
         # subStringInP = p.split('.')        
         if offset != len(s) and roffset != len(s):
@@ -164,45 +189,61 @@ class Solution:
 
 
 solution = Solution()
-# # print(solution.isMatch("aaaab", "a*b")) # the only match case: aaaab vs a*b
-# # print(solution.isMatch("afafbeeab", "a.*b"))
-# # # for the case below, you can't match the b  after * to the
-# # # final b. so how to decide which b should be matched?
-# # print(solution.isMatch("afafbeeab", "a.*beeab"))
-# # # same case, if we start from back to the front, which a 
-# # # should be matched to the a within (a.*)?
-# # print(solution.isMatch("afafbeeab", "afa.*beeab"))
-# # print(solution.isMatch("afafbeeab", "afa.*beeab"))
-# # print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab"))
-# # # the beeab definitely should match the last beeab in
-# # # the origianl string
-# # print(solution.isMatch("afafbeeabxxbeeab", "afa.*beeab.*b"))
-# # print(solution.isMatch("afafbeeabxxbeeab", "ada.*beeab.*b"))
 
-# if expected_result == None:                
-#     to_match = "aab"
-    
-#     test_map = dict([
-#         ("a.*b", True),
-#         ("a***b", True),
-#         ("aab", True),
-#         ("a.b", True),
-#         ("c*a*b", True),
-#         ("a.*c", False), 
-#         ("a.*b.*c", False)
-#     ])
-#     for (k, v) in test_map.items():
-#         print(k)
-#         try:
-#             assert (solution.isMatch(to_match, k)) == v
-#         except AssertionError as error:
-#             print("case with pattern {} failed".format(k))
-# else:
-#     try:
-#         assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
-#     except AssertionError as error:
-#         print("case with pattern {} failed".format(pattern))
+if TEST == 1:
+
+    try:
+        assert (solution.isMatch("aaaab", "a*b")) == True# the only match case: aaaab vs a*b
+        assert (solution.isMatch("afafbeeab", "a.*b")) == True
+        # for the case below, you can't match the b  after * to the
+        # final b. so how to decide which b should be matched?
+        assert (solution.isMatch("afafbeeab", "a.*beeab")) == True
+        # same case, if we start from back to the front, which a 
+        # should be matched to the a within (a.*)?
+        assert (solution.isMatch("afafbeeab", "afa.*beeab")) == True
+        assert (solution.isMatch("afafbeeab", "afa.*beeab")) == True
+        assert (solution.isMatch("afafbeeabxxbeeab", "afa.*beeab")) == True
+        # the beeab definitely should match the last beeab in
+        # the origianl string
+        assert (solution.isMatch("afafbeeabxxbeeab", "afa.*beeab.*b")) == True
+        assert (solution.isMatch("afafbeeabxxbeeab", "ada.*beeab.*b")) == False
         
-# print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) #TODO, think about how to handle the . case
-print(solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab"))
-# print(solution.isMatch("afcafcbeeabxxbeeab", "afc.*afc.*eab"))
+    except AssertionError as error:
+        _, _, tb = sys.exc_info()
+        traceback.print_tb(tb) # Fixed format
+        tb_info = traceback.extract_tb(tb)
+        filename, line, func, text = tb_info[-1]
+
+        print('An error occurred on line {} in statement {}'.format(line, text))
+
+    if expected_result == None:                
+        to_match = "aab"
+        
+        test_map = dict([
+            ("a.*b", True),
+            ("a***b", True),
+            ("aab", True),
+            ("a.b", True),
+            ("c*a*b", True),
+            ("a.*c", False), 
+            ("a.*b.*c", False)
+        ])
+        for (k, v) in test_map.items():
+            print(k)
+            try:
+                assert (solution.isMatch(to_match, k)) == v
+            except AssertionError as error:
+                print("case with pattern {} failed".format(k))
+    else:
+        try:
+            assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
+        except AssertionError as error:
+            print("case with pattern {} failed".format(pattern))
+            
+    print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) #TODO, think about how to handle the . case
+    print(solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab"))
+    print(solution.isMatch("afcafebeeabxxbeeab", "afc.*afc.*eab"))
+    print(solution.isMatch("acb", "ac"))
+
+
+print(solution.isMatch("aaabdcaeebdcampbqc", "a..ac.c"))
