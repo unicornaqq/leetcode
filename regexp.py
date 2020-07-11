@@ -138,8 +138,6 @@ class Solution:
                                 if star_sub.find('.') == -1:
                                     return False
                                 else:
-                                    # for (dot_index, dot_sub) in enumerate(star_sub):
-                                    #     #TODO
                                     log("the star_sub is {}".format(star_sub))
                                     # how about the case such as ..a.c.. which starts with . and/or end with ..
                                     # if  the sub string only contain ., 
@@ -147,10 +145,79 @@ class Solution:
                                     if dot_count == len(star_sub):
                                         # . for all
                                         log("all are dots")
+                                        star_left_index = offset + 1
+                                        star_right_index = roffset + 1
+                                        star_offset = star_left_index + len(star_sub)
+                                        star_roffset = star_right_index + len(star_sub)
+                                        
+                                        offset = star_offset # this is for the next iterate for .* splited substring
+                                        roffset = star_roffset
+                                        
+                                        if first_star_match == 0:
+                                            first_star_match = 1
+                                            left_index = star_left_index
+                                            right_index = star_right_index
+                                        
                                     else:
-                                        # some are alpha, find the index of those alpha                                    
+                                        # #TODO some are alpha, find the index of those alpha:                                     
                                         log("some are alpha")        
-                                    return False
+                                        dot_split_list = star_sub.split(".")
+                                        log(dot_split_list)
+                                        max_sub_len = 0
+                                        max_sub_index = 0
+                                        for (dot_list_index, dot_sub_string) in enumerate(dot_split_list):
+                                            if len(dot_sub_string) > max_sub_len:
+                                                max_sub_len = len(dot_sub_string)
+                                                max_sub_index = dot_list_index
+                                        max_sub_string = dot_split_list[max_sub_index]
+                                        log("max sub string is {}".format(max_sub_string))
+                                        try:
+                                            anchor_star_sub_offset = star_sub.index(max_sub_string)
+                                            anchor_raw = [i - anchor_star_sub_offset for (i,c) in enumerate(s) 
+                                                          if (max_sub_string.startswith(c) 
+                                                              and s[i:(i+len(max_sub_string))] == max_sub_string 
+                                                              and i >= anchor_star_sub_offset
+                                                              and i < (len(s)-len(max_sub_string))
+                                                              and i >= offset)]
+                                            # #TODO it is possible that there are multiple anchor point that can match, for example 3
+                                            # but the left and right most match is not the complete match, the middle is the 
+                                            # only match, this method can't cover it. 
+                                            # this dot case is different with other no-dot cases since what we are trying to match
+                                            # is just part of the substring, while for other cases, it matches the whole string, 
+                                            # found is found.
+                                            # so, we have to check all the possible locations of the anchors.
+                                            log("anchor_raw is {}".format(anchor_raw))
+                                            log("anchor_star_sub is {}".format(anchor_star_sub_offset))
+                                            # NOTE: need to loop over the anchor_raw list for each possible location
+                                            found_match_dot = False
+                                            for (i,dot_index) in enumerate(anchor_raw):
+                                                slice_raw_string = s[dot_index:(dot_index+len(star_sub))]
+                                                # log(slice_raw_string)
+                                                if any(dot == '.' or dot == slice_raw_string[i] for (i,dot) in enumerate(star_sub)):
+                                                    log(slice_raw_string)
+                                                    found_match_dot = True
+                                                    if i == 0:
+                                                        # TODO:update the left index
+                                                        log("found the matching at the beginning")
+                                                        star_left_index = dot_index
+                                                        if first_star_match == 0:
+                                                            first_star_match = 1
+                                                            left_index = star_left_index
+                                                        star_offset += len(star_sub)
+                                                        offset = star_offset
+                                                    if i == len(anchor_raw)-1:
+                                                        # TODO: update the right index
+                                                        log("find matching at the end")
+                                                        star_right_index = dot_index
+                                                        star_roffset += len(star_sub)
+                                                        roffset = star_roffset
+                                            if found_match_dot == False:
+                                                return False
+
+                                        except ValueError:
+                                            log("dot split substring is not found")
+                                            return False
+                                        
             if index == 0:
                 # it is the head
                 # for things at head, the left offset/left_index should at 0
@@ -161,8 +228,8 @@ class Solution:
                     # although it should do. Return 'False' 
                     # directly.
                     return False
-                # but there is another case, that the pattern only match partial of the string
-                # in this case, the left_index is 0, but it doesn't match. #TODO
+                # #TODO but there is another case, that the pattern only match partial of the string
+                # in this case, the left_index is 0, but it doesn't match. 
                 # maybe, this to do can be handled by change the below elif to if, the head and tail is not excluseive.
             
             if index == len(subStringInP) - 1:
@@ -170,6 +237,7 @@ class Solution:
                 # the right_index + string_len, or the roffset should be right
                 # to the end of the raw string
                 log("it is the tail offset={}, roffset={}".format(offset, roffset))
+                # TODO: for the case of abc.*, need to handle it carefully
                 if offset != len(s) and roffset != len(s):
                     return False
             
@@ -240,10 +308,11 @@ if TEST == 1:
         except AssertionError as error:
             print("case with pattern {} failed".format(pattern))
             
-    print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) #TODO, think about how to handle the . case
+    print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b"))
     print(solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab"))
     print(solution.isMatch("afcafebeeabxxbeeab", "afc.*afc.*eab"))
     print(solution.isMatch("acb", "ac"))
 
 
-print(solution.isMatch("aaabdcaeebdcampbqc", "a..ac.c"))
+print(solution.isMatch("aaabdcaeebdcampbqc", "...b.c.*"))
+# print(solution.isMatch("aaabdcaeebdcampbqc", "aaa.*......*bqc"))
