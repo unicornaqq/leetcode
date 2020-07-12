@@ -6,7 +6,7 @@ import traceback
 if len(sys.argv) == 4:
     (_, string, pattern, expected_result) = sys.argv[:]
 
-DEBUG = 0
+DEBUG = 1
 TEST = 1
 
 def log(var):
@@ -101,8 +101,8 @@ class Solution:
                             although, the a can match multiple instance TODO"""
                             
                             if previous_star_char != '' and (
-                                not any([ c == previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
-                                not any([ c == previous_star_char for c in s[previous_star_char_rindex:star_right_index]])):
+                                any([ c != previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
+                                any([ d != previous_star_char for d in s[previous_star_char_rindex:star_right_index]])):
                                 return False
                             
                             if previous_star_char == '' and (
@@ -112,6 +112,7 @@ class Solution:
                             # this is for the case that the * match 0 instance.
                                 return False
 
+                            
                         log([star_left_index, star_right_index])
                         star_offset = star_left_index + len(star_sub)
                         star_roffset = star_right_index + len(star_sub)
@@ -163,8 +164,8 @@ class Solution:
                                     if dot_count == len(star_sub):
                                         # . for all
                                         log("all are dots")
-                                        star_left_index = offset + 1
-                                        star_right_index = roffset + 1
+                                        star_left_index = offset
+                                        star_right_index = len(s)-len(star_sub)
                                         star_offset = star_left_index + len(star_sub)
                                         star_roffset = star_right_index + len(star_sub)
                                         
@@ -307,6 +308,7 @@ if TEST == 1:
         assert (solution.isMatch("aa", "a")) == False
         assert (solution.isMatch("mississippi", "mis*is*ip*.")) == True
         assert (solution.isMatch("mississippi", "mis*is*p*.")) == False
+        assert (solution.isMatch("aaa", "ab*a")) == False
 
         
     except AssertionError as error:
