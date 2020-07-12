@@ -79,6 +79,16 @@ class Solution:
                             first_star_match = 1
                             left_index = star_left_index
                             right_index = star_right_index
+
+                            log([star_left_index, star_right_index])
+                            star_offset = star_left_index + len(star_sub)
+                            star_roffset = star_right_index + len(star_sub)
+                            # the char to be repeated is at the end of substring
+                            previous_star_char_index = star_offset - 1
+                            previous_star_char_rindex = star_roffset - 1
+                            previous_star_char = star_sub[-1] # the char before * is the one to repeat
+                            offset = star_offset # this is for the next iterate for .* splited substring
+                            roffset = star_roffset
                         else:
                             # def, opl for the e.g. above
                             # check whether the * matches 0 char
@@ -112,23 +122,44 @@ class Solution:
                             # this is for the case that the * match 0 instance.
                                 return False
 
-                            
-                        log([star_left_index, star_right_index])
-                        star_offset = star_left_index + len(star_sub)
-                        star_roffset = star_right_index + len(star_sub)
-                        # the char to be repeated is at the end of substring
-                        previous_star_char_index = star_offset - 1
-                        previous_star_char_rindex = star_roffset - 1
-                        previous_star_char = star_sub[-1] # the char before * is the one to repeat
-                        offset = star_offset # this is for the next iterate for .* splited substring
-                        roffset = star_roffset
+                            if previous_star_char != '':
+                                if all([ c == previous_star_char for c in s[previous_star_char_index:star_left_index]]):
+                                    log([star_left_index])
+                                    star_offset = star_left_index + len(star_sub)
+                                    previous_star_char_index = star_offset - 1
+                                    previous_star_char = star_sub[-1] # the char before * is the one to repeat
+                                    offset = star_offset # this is for the next iterate for .* splited substring
+                                if all([ d == previous_star_char for d in s[previous_star_char_rindex:star_right_index]]):
+                                    log([star_right_index])
+                                    star_roffset = star_right_index + len(star_sub)
+                                    previous_star_char_rindex = star_roffset - 1
+                                    previous_star_char = star_sub[-1]
+                                    roffset = star_roffset
+                            else:
+                                if star_left_index == star_offset:
+                                    star_offset = star_left_index + len(star_sub)
+                                    previous_star_char_index = star_offset - 1
+                                    previous_star_char = star_sub[-1]
+                                    offset = star_offset
+                                if star_right_index == star_roffset:
+                                    star_roffset = star_right_index + len(star_sub)
+                                    previous_star_char_rindex = star_roffset - 1
+                                    previous_star_char = star_sub[-1] # the char before * is the one to repeat
+                                    roffset = star_roffset
                     except ValueError:
                         # there are two cases:
                         # 1. 0 match for the 0;
                         # 2. .
                         if star_sub[:-1] == '' and star_sub != '.':
-                            # such as a*
-                            continue
+                            if offset == len(s) and star_sub != previous_star_char:
+                                # this is for the case that, we have reached the end
+                                # but we can't find any match.
+                                return False
+                            else:
+                                # such c*a*b to match aab
+                                # when try to match c, it can't match anything
+                                # but for this case, we should let the match continue.
+                                continue
                         else:
                             try:
                                 # this is for the case of 0 match
@@ -137,7 +168,7 @@ class Solution:
                                 # NOTE: and for this case, we need to make sure
                                 # the next matched substring should follow
                                 # previous matched substring directly.
-                                if star_sub == '.':
+                                if star_sub.find('.') != -1:
                                     s.index(star_sub)
                                 star_left_index = s.index(star_sub[:-1], star_offset)
                                 star_right_index = s.rfind(star_sub[:-1], star_offset)
@@ -206,13 +237,14 @@ class Solution:
                                             # found is found.
                                             # so, we have to check all the possible locations of the anchors.
                                             log("anchor_raw is {}".format(anchor_raw))
-                                            log("anchor_star_sub is {}".format(anchor_star_sub_offset))
+                                            log("anchor_star_sub_offset is {}".format(anchor_star_sub_offset))
                                             # NOTE: need to loop over the anchor_raw list for each possible location
                                             found_match_dot = False
                                             for (i,dot_index) in enumerate(anchor_raw):
                                                 slice_raw_string = s[dot_index:(dot_index+len(star_sub))]
                                                 # log(slice_raw_string)
-                                                if any(dot == '.' or dot == slice_raw_string[i] for (i,dot) in enumerate(star_sub)):
+                                                if (len(star_sub) == len(slice_raw_string) and
+                                                    all(dot == '.' or dot == slice_raw_string[i] for (i,dot) in enumerate(star_sub))):
                                                     log(slice_raw_string)
                                                     found_match_dot = True
                                                     if i == 0:
@@ -231,6 +263,8 @@ class Solution:
                                                         star_roffset = star_right_index + len(star_sub)
                                                         roffset = star_roffset
                                             if found_match_dot == False:
+                                                # TODO, need to handle the case
+                                                # such as ..c*, where c should be 0 match.
                                                 return False
 
                                         except ValueError:
@@ -309,6 +343,17 @@ if TEST == 1:
         assert (solution.isMatch("mississippi", "mis*is*ip*.")) == True
         assert (solution.isMatch("mississippi", "mis*is*p*.")) == False
         assert (solution.isMatch("aaa", "ab*a")) == False
+        assert (solution.isMatch("a", "ab*a")) == False
+        assert (solution.isMatch("aab", "a.*b")) == True
+        assert (solution.isMatch("aab", "a***b")) == True
+        assert (solution.isMatch("aab", "aab")) == True
+        assert (solution.isMatch("aab", "a.b")) == True
+        assert (solution.isMatch("aab", "c*a*b")) == True
+        assert (solution.isMatch("aab", "a.*c")) == False
+        assert (solution.isMatch("aab", "a.*b.*c")) == False
+        assert (solution.isMatch("bbbba", ".*a*a")) == True
+        assert (solution.isMatch("ab", ".*..c*")) == True
+
 
         
     except AssertionError as error:
@@ -319,29 +364,6 @@ if TEST == 1:
 
         print('An error occurred on line {} in statement {}'.format(line, text))
 
-    if expected_result == None:                
-        to_match = "aab"
-        
-        test_map = dict([
-            ("a.*b", True),
-            ("a***b", True),
-            ("aab", True),
-            ("a.b", True),
-            ("c*a*b", True),
-            ("a.*c", False), 
-            ("a.*b.*c", False)
-        ])
-        for (k, v) in test_map.items():
-            # print(k)
-            try:
-                assert (solution.isMatch(to_match, k)) == v
-            except AssertionError as error:
-                print("case with pattern {} failed".format(k))
-    else:
-        try:
-            assert (solution.isMatch(string, pattern)) == (expected_result == 'True')
-        except AssertionError as error:
-            print("case with pattern {} failed".format(pattern))
             
     
 
