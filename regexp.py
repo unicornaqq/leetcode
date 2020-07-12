@@ -6,8 +6,8 @@ import traceback
 if len(sys.argv) == 4:
     (_, string, pattern, expected_result) = sys.argv[:]
 
-DEBUG = 1
-TEST = 0
+DEBUG = 0
+TEST = 1
 
 def log(var):
     if DEBUG == 1:
@@ -17,6 +17,8 @@ def log(var):
 
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
+        if p.find("*") == -1 and len(p) != len(s):
+            return False
         subStringInP = p.split('.*')
         log("the len of the string is {}".format(len(s)))
         log("Raw:{}".format(s))
@@ -99,9 +101,17 @@ class Solution:
                             although, the a can match multiple instance TODO"""
                             
                             if previous_star_char != '' and (
-                                any([ c != previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
-                                any([ c != previous_star_char for c in s[previous_star_char_rindex:star_right_index]])):
-                                return False 
+                                not any([ c == previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
+                                not any([ c == previous_star_char for c in s[previous_star_char_rindex:star_right_index]])):
+                                return False
+                            
+                            if previous_star_char == '' and (
+                                star_left_index != star_offset and
+                                star_right_index != star_roffset
+                            ):
+                            # this is for the case that the * match 0 instance.
+                                return False
+
                         log([star_left_index, star_right_index])
                         star_offset = star_left_index + len(star_sub)
                         star_roffset = star_right_index + len(star_sub)
@@ -112,7 +122,10 @@ class Solution:
                         offset = star_offset # this is for the next iterate for .* splited substring
                         roffset = star_roffset
                     except ValueError:
-                        if star_sub[:-1] == '':
+                        # there are two cases:
+                        # 1. 0 match for the 0;
+                        # 2. .
+                        if star_sub[:-1] == '' and star_sub != '.':
                             # such as a*
                             continue
                         else:
@@ -120,6 +133,11 @@ class Solution:
                                 # this is for the case of 0 match
                                 # so need to get rid of the end char, and try
                                 # to match again
+                                # NOTE: and for this case, we need to make sure
+                                # the next matched substring should follow
+                                # previous matched substring directly.
+                                if star_sub == '.':
+                                    s.index(star_sub)
                                 star_left_index = s.index(star_sub[:-1], star_offset)
                                 star_right_index = s.rfind(star_sub[:-1], star_offset)
                                 if first_star_match == 0:
@@ -209,7 +227,7 @@ class Solution:
                                                         # TODO: update the right index
                                                         log("find matching at the end")
                                                         star_right_index = dot_index
-                                                        star_roffset += len(star_sub)
+                                                        star_roffset = star_right_index + len(star_sub)
                                                         roffset = star_roffset
                                             if found_match_dot == False:
                                                 return False
@@ -239,7 +257,10 @@ class Solution:
                 log("it is the tail offset={}, roffset={}".format(offset, roffset))
                 # TODO: for the case of abc.*, need to handle it carefully
                 if offset != len(s) and roffset != len(s):
-                    return False
+                    if subStringInP[index] != '':
+                        return False
+                    else:
+                        return True
             
             # else:
                 # for pattern in the middle, it doesn't matter which part of the raw
@@ -250,10 +271,11 @@ class Solution:
                 
                 
         # subStringInP = p.split('.')        
-        if offset != len(s) and roffset != len(s):
-            return False
-        else:
-            return True
+        # if offset != len(s) and roffset != len(s):
+        #     return False
+        # else:
+        #     return True
+        return True
 
 
 solution = Solution()
@@ -275,6 +297,17 @@ if TEST == 1:
         # the origianl string
         assert (solution.isMatch("afafbeeabxxbeeab", "afa.*beeab.*b")) == True
         assert (solution.isMatch("afafbeeabxxbeeab", "ada.*beeab.*b")) == False
+
+        assert (solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b")) == False
+        assert (solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab")) == True
+        assert (solution.isMatch("afcafebeeabxxbeeab", "afc.*afc.*eab")) == False
+        assert (solution.isMatch("acb", "ac")) == False
+        assert (solution.isMatch("aaabdcaeebdcampbqc", "..ab.c.*")) == True
+        assert (solution.isMatch("aaabdcaeebdcampbqc", "aaa.*......*bqc")) == True
+        assert (solution.isMatch("aa", "a")) == False
+        assert (solution.isMatch("mississippi", "mis*is*ip*.")) == True
+        assert (solution.isMatch("mississippi", "mis*is*p*.")) == False
+
         
     except AssertionError as error:
         _, _, tb = sys.exc_info()
@@ -297,7 +330,7 @@ if TEST == 1:
             ("a.*b.*c", False)
         ])
         for (k, v) in test_map.items():
-            print(k)
+            # print(k)
             try:
                 assert (solution.isMatch(to_match, k)) == v
             except AssertionError as error:
@@ -308,11 +341,7 @@ if TEST == 1:
         except AssertionError as error:
             print("case with pattern {} failed".format(pattern))
             
-    print(solution.isMatch("afafbeeabxxbeeab", "ad*a.*beeab.*e.b"))
-    print(solution.isMatch("afafbeeabxxbeeab", "af*a.*fb.*eab"))
-    print(solution.isMatch("afcafebeeabxxbeeab", "afc.*afc.*eab"))
-    print(solution.isMatch("acb", "ac"))
+    
 
 
-print(solution.isMatch("aaabdcaeebdcampbqc", "...b.c.*"))
-# print(solution.isMatch("aaabdcaeebdcampbqc", "aaa.*......*bqc"))
+
