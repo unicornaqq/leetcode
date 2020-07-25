@@ -2,6 +2,8 @@ import sys
 import traceback
 from enum import Enum
 
+# recursive method will be used when the substate is not determinated.
+
 
 (_, string, pattern, expected_result) = (None, None, None, None)
 if len(sys.argv) == 4:
