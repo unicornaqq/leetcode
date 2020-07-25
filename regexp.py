@@ -1,5 +1,6 @@
 import sys
 import traceback
+from enum import Enum
 
 
 (_, string, pattern, expected_result) = (None, None, None, None)
@@ -48,6 +49,11 @@ class dot_star_pattern(sub_pattern):
         while(s[input_index].isalpha()):
             input_index += 1
         return (True, input_index)
+
+class type(Enum):
+    START = 1
+    MIDDLE = 2
+    END = 3
         
 class sub_state:
     def __init__(self, type, sub_pattern):
@@ -60,8 +66,7 @@ class sub_state:
 class reg_state_machine:
     def __init__(self, regexp):
         log("created a statemachine with pattern {}".format(regexp))
-        
-        
+
     
     def run(self, s):
         log("statemachine is running")
