@@ -79,6 +79,7 @@ class reg_state_machine:
                         pattern = dot_star_pattern()
                     else:
                         pattern = alpha_star_pattern(previous_char)
+                    previous_char = None
                 else:
                     # not star kind of pattern
                     if previous_char == '.':
@@ -90,12 +91,16 @@ class reg_state_machine:
                 if index == len(regex) - 1:
                     # need to construct state for both previous_char and current char
                     log("last char handling")
+                    
                 else:
-                    log("middle char handling")
+                    log("middle char handling or head char handling")
+                    if index == 1:
+                        state_type = type.START
+                    else:
+                        state_type = type.MIDDLE
                     
             else:
                 # TODO: previous_char can't be used to decide whether it is start of the string
-                state_type = type.START
                 previous_char = char
     
     def run(self, s):
