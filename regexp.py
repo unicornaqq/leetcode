@@ -15,303 +15,64 @@ def log(var):
     else:
         return
 
+class sub_pattern:
+    def next(self, s, input_index):
+        log("next")
+    
+class dot_pattern(sub_pattern):
+    def next(self, s, input_index):
+        if s[input_index].isalpha():
+            return (True, input_index+1)
+        else:
+            return (False, input_index+1)
+        
+class alpha_pattern(sub_pattern):
+    def __init__(self, char):
+        __char__ = char
+    def next(self, s, input_index):
+        if s[input_index] == __char__:
+            return (True, input_index+1)
+        else:
+            return (False, input_index+1)
+        
+class alpha_star_pattern(sub_pattern):
+    def __init__(self, char):
+        __char__ = char
+    def next(self, s, input_index):
+        while(s[input_index] == __char__):
+            input_index += 1
+        return (True, input_index)
+    
+class dot_star_pattern(sub_pattern):
+    def next(self, s, input_index):
+        while(s[input_index].isalpha()):
+            input_index += 1
+        return (True, input_index)
+        
+class sub_state:
+    def __init__(self, type, sub_pattern):
+        type = type
+        sub_pattern = sub_pattern
+    def next(self):
+        sub_pattern.next()
+
+
+class reg_state_machine:
+    def __init__(self, regexp):
+        log("created a statemachine with pattern {}".format(regexp))
+        
+        
+    
+    def run(self, s):
+        log("statemachine is running")
+    
+
+
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        if p.find("*") == -1 and len(p) != len(s):
-            return False
-        subStringInP = p.split('.*')
-        log("the len of the string is {}".format(len(s)))
-        log("Raw:{}".format(s))
-        log("Pattern:{}".format(p))
-        log(subStringInP)
-
-
-        left_index = 0
-        right_index = 0
-        offset = 0
-        roffset = 0
-        
-        for (index, sub) in enumerate(subStringInP):
-            # with this method, we can make sure the sub
-            # doesn't contain any .*, it means
-            # it contains just char, . or *
-            try:
-                if sub == '':
-                    (left_index, right_index, offset, roffset) = (left_index, right_index, offset, roffset)
-                else:
-                    left_index = s.index(sub, offset)
-                    right_index = s.rfind(sub, offset)
-                    offset = left_index + len(sub)
-                    roffset = right_index + len(sub)
-                log([left_index, right_index])
-            except ValueError:
-                # there could be * or . in the sub string
-                # try to split the sub string with * first
-                if sub.find("*") == -1 and sub.find(".") == -1:
-                    return False
-                starSubString = sub.split("*")
-                # the case with no * inside will be simplified
-                # to single string.
-                log(starSubString)
-                # return None
-                previous_star_char_index = 0
-                previous_star_char_rindex = 0
-                previous_star_char = ''
-                first_star_match = 0
-                star_offset = offset # we start from the end of last matched sub string
-                star_roffset = roffset
-                for (star_index, star_sub) in enumerate(starSubString):
-                    log([star_index, star_sub, star_offset, star_roffset])
-                    if star_sub == '':
-                        # this is corresponding to the case 
-                        # with multiple * concatenated
-                        continue
-                    try:
-                        star_left_index = s.index(star_sub, star_offset)
-                        star_right_index = s.rfind(star_sub, star_offset)
-                        if first_star_match == 0:
-                            # this is the first sub string of
-                            # the string splited by *
-                            # e.g. abc*def*opl
-                            # the location of a indicate the start
-                            # of the "abc*def*opl", which is recored by 
-                            # left_index
-                            first_star_match = 1
-                            left_index = star_left_index
-                            right_index = star_right_index
-
-                            log([star_left_index, star_right_index])
-                            star_offset = star_left_index + len(star_sub)
-                            star_roffset = star_right_index + len(star_sub)
-                            # the char to be repeated is at the end of substring
-                            previous_star_char_index = star_offset - 1
-                            previous_star_char_rindex = star_roffset - 1
-                            previous_star_char = star_sub[-1] # the char before * is the one to repeat
-                            offset = star_offset # this is for the next iterate for .* splited substring
-                            roffset = star_roffset
-                        else:
-                            # def, opl for the e.g. above
-                            # check whether the * matches 0 char
-                            # or match repeated char.
-                            # if previous_star_char is '', it means * represent
-                            # 0 char. don't need to care about in this 
-                            # branch. And it is handled in the exception
-                            # handling logic.
-                            
-                            
-                            """ after split the string with *, there could be different
-                            way to match the substring, need to find out which way
-                            is the right match, and then based on that match method to figure out
-                            the offset and roffset of the whole substring containning *.
-                            for the example:
-                                Raw:afafbeeabxxbeeab
-                                Pattern:af*a.*afa.*eab
-                            although [af, a] can match the raw string in different way
-                            but only afa at the head of the string should be the match object.
-                            although, the a can match multiple instance TODO"""
-                            
-                            if previous_star_char != '' and (
-                                any([ c != previous_star_char for c in s[previous_star_char_index:star_left_index]]) and 
-                                any([ d != previous_star_char for d in s[previous_star_char_rindex:star_right_index]])):
-                                return False
-                            
-                            if previous_star_char == '' and (
-                                star_left_index != star_offset and
-                                star_right_index != star_roffset
-                            ):
-                            # this is for the case that the * match 0 instance.
-                                return False
-
-                            if previous_star_char != '':
-                                if all([ c == previous_star_char for c in s[previous_star_char_index:star_left_index]]):
-                                    log([star_left_index])
-                                    star_offset = star_left_index + len(star_sub)
-                                    previous_star_char_index = star_offset - 1
-                                    previous_star_char = star_sub[-1] # the char before * is the one to repeat
-                                    offset = star_offset # this is for the next iterate for .* splited substring
-                                if all([ d == previous_star_char for d in s[previous_star_char_rindex:star_right_index]]):
-                                    log([star_right_index])
-                                    star_roffset = star_right_index + len(star_sub)
-                                    previous_star_char_rindex = star_roffset - 1
-                                    previous_star_char = star_sub[-1]
-                                    roffset = star_roffset
-                            else:
-                                if star_left_index == star_offset:
-                                    star_offset = star_left_index + len(star_sub)
-                                    previous_star_char_index = star_offset - 1
-                                    previous_star_char = star_sub[-1]
-                                    offset = star_offset
-                                if star_right_index == star_roffset:
-                                    star_roffset = star_right_index + len(star_sub)
-                                    previous_star_char_rindex = star_roffset - 1
-                                    previous_star_char = star_sub[-1] # the char before * is the one to repeat
-                                    roffset = star_roffset
-                    except ValueError:
-                        # there are two cases:
-                        # 1. 0 match for the 0;
-                        # 2. .
-                        if star_sub[:-1] == '' and star_sub != '.':
-                            if offset == len(s) and star_sub != previous_star_char:
-                                # this is for the case that, we have reached the end
-                                # but we can't find any match.
-                                return False
-                            else:
-                                # such c*a*b to match aab
-                                # when try to match c, it can't match anything
-                                # but for this case, we should let the match continue.
-                                continue
-                        else:
-                            try:
-                                # this is for the case of 0 match
-                                # so need to get rid of the end char, and try
-                                # to match again
-                                # NOTE: and for this case, we need to make sure
-                                # the next matched substring should follow
-                                # previous matched substring directly.
-                                if star_sub.find('.') != -1:
-                                    s.index(star_sub)
-                                star_left_index = s.index(star_sub[:-1], star_offset)
-                                star_right_index = s.rfind(star_sub[:-1], star_offset)
-                                if first_star_match == 0:
-                                    first_star_match = 1
-                                    left_index = star_left_index
-                                    right_index = star_right_index
-                                star_offset += len(star_sub[:-1])
-                                star_roffset += len(star_sub[:-1])
-                                offset = star_offset
-                                roffset = star_roffset
-
-                            except ValueError:
-                                # it is possible, there is/are . inside the current substring
-                                # use the . to split the sub string
-                                # the distance between the sub string should be 1
-                                if star_sub.find('.') == -1:
-                                    return False
-                                else:
-                                    log("the star_sub is {}".format(star_sub))
-                                    # how about the case such as ..a.c.. which starts with . and/or end with ..
-                                    # if  the sub string only contain ., 
-                                    dot_count = star_sub.count('.')
-                                    if dot_count == len(star_sub):
-                                        # . for all
-                                        log("all are dots")
-                                        star_left_index = offset
-                                        star_right_index = len(s)-len(star_sub)
-                                        star_offset = star_left_index + len(star_sub)
-                                        star_roffset = star_right_index + len(star_sub)
-                                        
-                                        offset = star_offset # this is for the next iterate for .* splited substring
-                                        roffset = star_roffset
-                                        
-                                        if first_star_match == 0:
-                                            first_star_match = 1
-                                            left_index = star_left_index
-                                            right_index = star_right_index
-                                        
-                                    else:
-                                        # #TODO some are alpha, find the index of those alpha:                                     
-                                        log("some are alpha")        
-                                        dot_split_list = star_sub.split(".")
-                                        log(dot_split_list)
-                                        max_sub_len = 0
-                                        max_sub_index = 0
-                                        for (dot_list_index, dot_sub_string) in enumerate(dot_split_list):
-                                            if len(dot_sub_string) > max_sub_len:
-                                                max_sub_len = len(dot_sub_string)
-                                                max_sub_index = dot_list_index
-                                        max_sub_string = dot_split_list[max_sub_index]
-                                        log("max sub string is {}".format(max_sub_string))
-                                        try:
-                                            anchor_star_sub_offset = star_sub.index(max_sub_string)
-                                            anchor_raw = [i - anchor_star_sub_offset for (i,c) in enumerate(s) 
-                                                          if (max_sub_string.startswith(c) 
-                                                              and s[i:(i+len(max_sub_string))] == max_sub_string 
-                                                              and i >= anchor_star_sub_offset
-                                                              and i < (len(s)-len(max_sub_string))
-                                                              and i >= offset)]
-                                            # #TODO it is possible that there are multiple anchor point that can match, for example 3
-                                            # but the left and right most match is not the complete match, the middle is the 
-                                            # only match, this method can't cover it. 
-                                            # this dot case is different with other no-dot cases since what we are trying to match
-                                            # is just part of the substring, while for other cases, it matches the whole string, 
-                                            # found is found.
-                                            # so, we have to check all the possible locations of the anchors.
-                                            log("anchor_raw is {}".format(anchor_raw))
-                                            log("anchor_star_sub_offset is {}".format(anchor_star_sub_offset))
-                                            # NOTE: need to loop over the anchor_raw list for each possible location
-                                            found_match_dot = False
-                                            for (i,dot_index) in enumerate(anchor_raw):
-                                                slice_raw_string = s[dot_index:(dot_index+len(star_sub))]
-                                                # log(slice_raw_string)
-                                                if (len(star_sub) == len(slice_raw_string) and
-                                                    all(dot == '.' or dot == slice_raw_string[i] for (i,dot) in enumerate(star_sub))):
-                                                    log(slice_raw_string)
-                                                    found_match_dot = True
-                                                    if i == 0:
-                                                        # TODO:update the left index
-                                                        log("found the matching at the beginning")
-                                                        star_left_index = dot_index
-                                                        if first_star_match == 0:
-                                                            first_star_match = 1
-                                                            left_index = star_left_index
-                                                        star_offset += len(star_sub)
-                                                        offset = star_offset
-                                                    if i == len(anchor_raw)-1:
-                                                        # TODO: update the right index
-                                                        log("find matching at the end")
-                                                        star_right_index = dot_index
-                                                        star_roffset = star_right_index + len(star_sub)
-                                                        roffset = star_roffset
-                                            if found_match_dot == False:
-                                                # TODO, need to handle the case
-                                                # such as ..c*, where c should be 0 match.
-                                                return False
-
-                                        except ValueError:
-                                            log("dot split substring is not found")
-                                            return False
-                                        
-            if index == 0:
-                # it is the head
-                # for things at head, the left offset/left_index should at 0
-                # for head, we should use the left_index. 
-                log("it is the head offset={}, roffset={}".format(offset, roffset))
-                if left_index != 0:
-                    # it doesn't match the head of the string
-                    # although it should do. Return 'False' 
-                    # directly.
-                    return False
-                # #TODO but there is another case, that the pattern only match partial of the string
-                # in this case, the left_index is 0, but it doesn't match. 
-                # maybe, this to do can be handled by change the below elif to if, the head and tail is not excluseive.
-            
-            if index == len(subStringInP) - 1:
-                # for pattern at the end, we should check the right_index instead.
-                # the right_index + string_len, or the roffset should be right
-                # to the end of the raw string
-                log("it is the tail offset={}, roffset={}".format(offset, roffset))
-                # TODO: for the case of abc.*, need to handle it carefully
-                if offset != len(s) and roffset != len(s):
-                    if subStringInP[index] != '':
-                        return False
-                    else:
-                        return True
-            
-            # else:
-                # for pattern in the middle, it doesn't matter which part of the raw
-                # string deos the pattern match to.
-                # log("it is the middle")
-                # if left_index == 0 or offset == len(s):
-                #     return False
-                
-                
-        # subStringInP = p.split('.')        
-        # if offset != len(s) and roffset != len(s):
-        #     return False
-        # else:
-        #     return True
+        statemachine = reg_state_machine(p)
+        statemachine.run(s)
         return True
-
 
 solution = Solution()
 
