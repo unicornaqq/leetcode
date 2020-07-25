@@ -56,6 +56,7 @@ class type(Enum):
     START = 1
     MIDDLE = 2
     END = 3
+    UNDEF = 4
         
 class sub_state:
     def __init__(self, type, sub_pattern):
@@ -68,7 +69,34 @@ class sub_state:
 class reg_state_machine:
     def __init__(self, regexp):
         log("created a statemachine with pattern {}".format(regexp))
-
+        previous_char = None
+        state_type = type.UNDEF
+        for (index, char) in enumerate(regexp):
+            if previous_char != None:
+                # previous_char has been set
+                if char == '*':
+                    if previous_char == '.':
+                        pattern = dot_star_pattern()
+                    else:
+                        pattern = alpha_star_pattern(previous_char)
+                else:
+                    # not star kind of pattern
+                    if previous_char == '.':
+                        pattern = dot_pattern()
+                    else:
+                        pattern = alpha_pattern(previous_char)
+                    previous_char = char
+                        
+                if index == len(regex) - 1:
+                    # need to construct state for both previous_char and current char
+                    log("last char handling")
+                else:
+                    log("middle char handling")
+                    
+            else:
+                # TODO: previous_char can't be used to decide whether it is start of the string
+                state_type = type.START
+                previous_char = char
     
     def run(self, s):
         log("statemachine is running")
