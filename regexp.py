@@ -1,6 +1,6 @@
 import sys
 import traceback
-from enum import Enum
+from pprint import pprint
 
 # recursive method will be used when the substate is not determinated.
 
@@ -18,101 +18,55 @@ def log(var):
     else:
         return
 
-class sub_pattern:
-    def next(self, s, input_index):
-        log("next")
-    
-class dot_pattern(sub_pattern):
-    def next(self, s, input_index):
-        if s[input_index].isalpha():
-            return (True, input_index+1)
-        else:
-            return (False, input_index+1)
-        
-class alpha_pattern(sub_pattern):
-    def __init__(self, char):
-        __char__ = char
-    def next(self, s, input_index):
-        if s[input_index] == __char__:
-            return (True, input_index+1)
-        else:
-            return (False, input_index+1)
-        
-class alpha_star_pattern(sub_pattern):
-    def __init__(self, char):
-        __char__ = char
-    def next(self, s, input_index):
-        while(s[input_index] == __char__):
-            input_index += 1
-        return (True, input_index)
-    
-class dot_star_pattern(sub_pattern):
-    def next(self, s, input_index):
-        while(s[input_index].isalpha()):
-            input_index += 1
-        return (True, input_index)
-
-class type(Enum):
-    START = 1
-    MIDDLE = 2
-    END = 3
-    UNDEF = 4
-        
-class sub_state:
-    def __init__(self, type, sub_pattern):
-        type = type
-        sub_pattern = sub_pattern
-    def next(self):
-        sub_pattern.next()
-
-
-class reg_state_machine:
-    def __init__(self, regexp):
-        log("created a statemachine with pattern {}".format(regexp))
-        previous_char = None
-        state_type = type.UNDEF
-        for (index, char) in enumerate(regexp):
-            if previous_char != None:
-                # previous_char has been set
-                if char == '*':
-                    if previous_char == '.':
-                        pattern = dot_star_pattern()
-                    else:
-                        pattern = alpha_star_pattern(previous_char)
-                    previous_char = None
-                else:
-                    # not star kind of pattern
-                    if previous_char == '.':
-                        pattern = dot_pattern()
-                    else:
-                        pattern = alpha_pattern(previous_char)
-                    previous_char = char
-                        
-                if index == len(regex) - 1:
-                    # need to construct state for both previous_char and current char
-                    log("last char handling")
-                    
-                else:
-                    log("middle char handling or head char handling")
-                    if index == 1:
-                        state_type = type.START
-                    else:
-                        state_type = type.MIDDLE
-                    
-            else:
-                # TODO: previous_char can't be used to decide whether it is start of the string
-                previous_char = char
-    
-    def run(self, s):
-        log("statemachine is running")
-    
-
-
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        statemachine = reg_state_machine(p)
-        statemachine.run(s)
-        return True
+        # 1. think about the normal case/pattern
+        # 2. think about the boundary/corner case.
+        # match[M][N] means whether s(len=M) match p(len=N)
+        # match[i][j] = True if s(1, i-1) match with p(1, j-1)
+        # [0, 1, ... i-2, i-1, ., ...]
+        # [0, 1, ... j-2, j-1, ., ...]
+        match = [[False for x in range(len(p)+1)] for y in range(len(s)+1)]
+        match[0][0] = True
+        # pprint(match)
+        for i in range(0, len(s)+1):
+            # how handle the i == 0 case?
+            # if i == 0:
+            # it will try to check s[-1] which is definitely not acceptable
+            # for the case of i == 0, which means it is an empty string.
+            #
+            # The only match cases:
+            #   1. to match an empty string which is match[0][0]
+            # which has been covered above;
+            #   2. to match an empty string with p == '.*', which is corresponding
+            # to match[0][2], it should be True. It goes to the branch: match[i][j-2].
+            for j in range(1, len(p)+1):
+                # for the j == 0 case, that means the pattern is empty. 
+                # nothing can be matched as long as the input string s is not empty.
+                # so, we just skip the j == 0 case in this loop, and leave it to the default False value.
+                # print([i, j])
+                if p[j-1] == '*' and j > 1:
+                    # print("p[{}] is {}". format(j-1, p[j-1])) 
+                    #                  a
+                    # [0, 1, ... i-2, i-1, ., ...]
+                    # [0, 1, ... j-2, j-1, ., ...]
+                    #             a,  *
+                    match[i][j] = (i > 0 and match[i-1][j] and (s[i-1] == p[j-2] or p[j-2] == '.')) or match[i][j-2]
+                else:
+                    # for the j == 1 case:
+                    # that means match[i][1] is try to match s(0, 1, 2, .. i-1) and p[0]
+                    # you know, the only potential match case is s[0] and p[0], which
+                    # is corresponding to match[1][1], so, it will be derived from match[0][0]
+                    # if s[0] == p[0]. This kind of match is exactly what we want, single char match case.
+                    match[i][j] = i > 0 and match[i-1][j-1] and (s[i-1] == p[j-1] or p[j-1] == '.')
+                # print([i, j, match[i][j]])
+        # pprint(match)
+        return(match[len(s)][len(p)])
+                
+                
+            
+                
+                
 
 solution = Solution()
 
