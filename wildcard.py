@@ -39,7 +39,7 @@ class Solution:
                     # [0, 1, ... i-2, i-1, ., ...]
                     # [0, 1, ... j-2, j-1, ., ...]
                     #             #,  ?
-                    # it can match 0 or 1 any char for '?'
+                    # it can match 1 any char for '?'
                     match[i][j] = ((match[i-1][j-1] and i > 0) ) # for 1 instance match
                 else:
                     match[i][j] = (i > 0 and match[i-1][j-1] and 
