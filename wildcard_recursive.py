@@ -36,6 +36,12 @@ solution = Solution()
 
 if TEST == 1:
 
+    '''
+        there is a case from leetcode, and our algorithrm has run long time, maybe even a loop, need to figure out
+        "aaabaaabaabababbabababaababbabbbbaaaaababbaabbbaab"
+        "*babbbb*aab**b*bb*aa*"
+    '''
+
     try:
         assert (solution.isMatch("aaaab", "a*b")) == True
         assert (solution.isMatch("ab", "a?b")) == False
