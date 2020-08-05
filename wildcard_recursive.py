@@ -30,36 +30,7 @@ class Solution:
                     return len(s)> 0 and self.isMatch(s[:-1], p[:-1])
                 else:
                     return len(s) > 0 and self.isMatch(s[:-1], p[:-1]) and s[-1] == p[-1]
-        
-        
-        # for i in range(0, len(s)+1):
-        #     for j in range(1, len(p)+1):
-        #         if p[j-1] == '*':
-        #             # # here means every a-z
-        #             #                  #
-        #             # [0, 1, ... i-2, i-1, ., ...]
-        #             # [0, 1, ... j-2, j-1, ., ...]
-        #             #             #,  *
-        #             match[i][j] = ((i > 0 and match[i-1][j]) # no matter what s[i-1] is, since * match a sequence of chars here
-        #                         or match[i][j-1]) # nothing matched by * here
-        #         elif p[j-1] == '?':
-        #             #                  #
-        #             # [0, 1, ... i-2, i-1, ., ...]
-        #             # [0, 1, ... j-2, j-1, ., ...]
-        #             #             #,  ?
-        #             # it can match 1 any char for '?'
-        #             match[i][j] = ((match[i-1][j-1] and i > 0) ) # for 1 instance match
-        #         else:
-        #             match[i][j] = (i > 0 and match[i-1][j-1] and 
-        #                             s[i-1] == p[j-1])
-        #         # print([i, j, match[i][j]])
-        # # pprint(match)
-        # return(match[len(s)][len(p)])
-                
-                
-            
-                
-                
+
 
 solution = Solution()
 
