@@ -1,6 +1,11 @@
 import sys
 import traceback
 from pprint import pprint
+import line_profiler
+import atexit
+
+profile = line_profiler.LineProfiler()
+atexit.register(profile.print_stats)
 
 DEBUG = 1
 TEST = 1
@@ -12,6 +17,7 @@ def log(var):
         return
 
 class Solution:
+    @profile
     def isMatch(self, s: str, p: str) -> bool:
         # match any char sequence - *
         # match single char - ?
@@ -58,14 +64,15 @@ solution = Solution()
 if TEST == 1:
 
     try:
-        assert (solution.isMatch("aaaab", "a*b")) == True
-        assert (solution.isMatch("ab", "a?b")) == False
-        assert (solution.isMatch("aa", "a")) == False
-        assert (solution.isMatch("aa", "*")) == True
-        assert (solution.isMatch("cb", "?a")) == False
-        assert (solution.isMatch("adceb", "*a*b")) == True
-        assert (solution.isMatch("acdcb", "a*c?b")) == False
-
+        # assert (solution.isMatch("aaaab", "a*b")) == True
+        # assert (solution.isMatch("ab", "a?b")) == False
+        # assert (solution.isMatch("aa", "a")) == False
+        # assert (solution.isMatch("aa", "*")) == True
+        # assert (solution.isMatch("cb", "?a")) == False
+        # assert (solution.isMatch("adceb", "*a*b")) == True
+        # assert (solution.isMatch("acdcb", "a*c?b")) == False
+        # assert (solution.isMatch("acdcmkpotployopkacdcmkpotployopk", "a*c?m*?o*plo?lpoa*c?m*?o*plo?lpo")) == False
+        assert (solution.isMatch("aaabaaabaabababbabababaababbabbbbaaaaababbaabbbaab", "*babbbb*aab**b*bb*aa*")) == True
 
         
     except AssertionError as error:
