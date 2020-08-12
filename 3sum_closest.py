@@ -17,8 +17,44 @@ Constraints:
 -10^3 <= nums[i] <= 10^3
 -10^4 <= target <= 10^4 
 
+if I sort the nums => [-4, -1, 1, 1*, 2]
+
 """
 
 class Solution:
-    def threeSumClosest(self, nums: List[int], target: int) -> int:
-
+    def threeSum(self, nums, target, hash_table):
+        # print("target is {}".format(target))
+        result = []
+        # init the hash table for later usage
+        if len(nums) < 3:
+            return result
+        for i in range(len(nums)):
+            for j in range(i+1, len(nums)):                        
+                index = hash_table.get(target - nums[i] - nums[j])
+                if index != None and index != i and index != j:                
+                    result = [nums[i], nums[j], nums[index]]
+        return result
+    
+    def threeSumClosest(self, nums, target: int) -> int:
+        
+        hash_table = dict()
+        for (index, number) in enumerate(nums):
+            hash_table[number] = index
+        
+        result = None
+        for i in range(0, max(abs(3000-target), abs(-3000-target))+1):
+            result = self.threeSum(nums, target+i, hash_table)
+            if len(result) != 0:
+                return sum(result)
+            else:
+                result = self.threeSum(nums, target-i, hash_table)
+                if len(result) != 0:
+                    return sum(result)
+        return result
+    
+    
+list = [-1,2,1,-4]
+target = -10000
+solu = Solution()
+print(solu.threeSumClosest(list, target))
+                
