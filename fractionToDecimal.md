@@ -60,3 +60,6 @@ I have noticed that negative value and positive value can generate result when u
 ```
 
 #### The meaning of **//** in Python.
+TODO:
+### Handle some boundary case
+Remember to handle the non-recurring and non-decimal case.
