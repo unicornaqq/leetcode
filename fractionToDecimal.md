@@ -60,6 +60,11 @@ I have noticed that negative value and positive value can generate result when u
 ```
 
 #### The meaning of **//** in Python.
-TODO:
+
+[Useful explain about the division](https://stackoverflow.com/questions/5365665/python-3-integer-division-how-to-make-math-operators-consistant-with-c)
+
+[PEP238 about the changes of division](https://www.python.org/dev/peps/pep-0238/)
+
 ### Handle some boundary case
 Remember to handle the non-recurring and non-decimal case.
+
