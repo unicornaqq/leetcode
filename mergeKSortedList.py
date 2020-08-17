@@ -74,7 +74,7 @@ class Solution:
                     
     def mergeKLists(self, lists) -> ListNode:
         temp = self.merge(lists)
-        print_singly_linked_list(temp)
+        # print_singly_linked_list(temp)
         return temp
         
 

@@ -65,6 +65,12 @@ I have noticed that negative value and positive value can generate result when u
 
 [PEP238 about the changes of division](https://www.python.org/dev/peps/pep-0238/)
 
-### Handle some boundary case
-Remember to handle the non-recurring and non-decimal case.
+> x//y to return the floor ("floor division")
+> 
+> During the transitional phase, we have to support three division operators within the same program: classic division (for / in modules without a future division statement), true division (for / in modules with a future division statement), and floor division (for //). Each operator comes in two flavors: regular, and as an augmented assignment operator (/= or //=).
+> 
+> a // b == floor(a/b)
 
+### Handle some boundary case
+
+Remember to handle the non-recurring and non-decimal case.
