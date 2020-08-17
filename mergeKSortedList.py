@@ -28,10 +28,10 @@ Output: [] """
 # How do we know which one from which list is bigger? 
 
 
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
+from sortedList import ListNode
+from sortedList import list_to_singly_linked_list
+from sortedList import print_singly_linked_list
+
 class Solution:
     def merge(self, lists):
         # print(lists)
@@ -76,27 +76,6 @@ class Solution:
         temp = self.merge(lists)
         # print_singly_linked_list(temp)
         return temp
-        
-
-def list_to_singly_linked_list(list):
-    prev = None
-    head = None
-    for (i, ele) in enumerate(list):
-        node = ListNode(ele)
-        if i == 0:
-            head = node
-        if prev is not None:
-            prev.next = node
-        prev = node
-    return head
-
-def print_singly_linked_list(head):
-    current = head
-    result = []
-    while current is not None:
-        result.append(current.val)
-        current = current.next
-    print(result)
 
 
 lists = [[1,4,5],[1,3,4],[2,6]]
