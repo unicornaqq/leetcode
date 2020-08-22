@@ -31,18 +31,38 @@ class Solution:
         if divisor == 1:
             result = dividend
         else:
+            double_divisor = divisor << 1
+            triple_divisor = double_divisor + divisor
+            qual_divisor = double_divisor << 1
+            fif_divisor = qual_divisor + divisor
+            six_divisor = triple_divisor << 1
+            seventh_divisor = six_divisor + divisor
+            eight_divisor = qual_divisor << 1
+            
             if dividend < divisor:
                 result = 0
-            elif dividend >= divisor and dividend < (divisor + divisor):
+            elif dividend >= divisor and dividend < double_divisor:
                 result = 1
+            elif dividend >= double_divisor and dividend < triple_divisor:
+                result = 2
+            elif dividend >= triple_divisor and dividend < qual_divisor:
+                result = 3
+            elif dividend >= qual_divisor and dividend < fif_divisor:
+                result = 4
+            elif dividend >= fif_divisor and dividend < six_divisor:
+                result = 5
+            elif dividend >= six_divisor and dividend < seventh_divisor:
+                result = 6
+            elif dividend >= seventh_divisor and dividend < eight_divisor:
+                result = 7
             else:
                 # result = self.divide(dividend-divisor-divisor, divisor) + result + result
                 # for this case, the dividen is >= 2* divisor
                 double_divisor = divisor
                 temp = 1
-                while (double_divisor << 1) <= dividend:
-                    double_divisor = double_divisor << 1
-                    temp = temp << 1
+                while (double_divisor << 3) <= dividend:
+                    double_divisor = double_divisor << 3
+                    temp = temp << 3
                 left = dividend - double_divisor
                 result = temp + self.divide(left, divisor)
         result = sign * result
@@ -52,8 +72,8 @@ class Solution:
             return result
 
 sol = Solution()
-print(sol.divide(2147483647, 2))
-# print(sol.divide(100, 2))
+# print(sol.divide(2147483647, 2))
+print(sol.divide(100, 3))
 
 """ -2147483648
 -1 """
