@@ -25,25 +25,25 @@ class Solution:
         return []
       result = []
       word_dict = {word: words.count(word) for word in words}
-      #print(word_dict)
+      print(word_dict)
       original_copy = word_dict.copy()
       len_of_raw_string = len(s)
       len_of_sub = len(words[0])
       first_match = True
-      temp = 0
+      temp = None
       i = 0
       while i <= (len_of_raw_string-len_of_sub):
       # for i in range(0, len_of_raw_string-len_of_sub, len_of_sub):
-        #print("i is {}".format(i))
-        #print(s[i:len_of_sub+i])
+        print("i is {}".format(i))
+        print(s[i:len_of_sub+i])
         if (word := s[i:len_of_sub+i]) in words:
-          #print(word)
+          print(word)
           # before -1 from the dict, it is 0 already, means, we should start a new match instance
           # please note, the offset should continue from previous offset.
           if word_dict[word] == 0:
             word_dict = original_copy.copy()
             first_match = True
-            i = temp + len_of_sub
+            i = temp + 1
             continue
           if first_match == True:
             temp = i
@@ -60,8 +60,11 @@ class Solution:
         else:
           word_dict = original_copy.copy()
           first_match = True
+          if temp != None:
+            i = temp
+            temp = None
           # i = temp
-        #print(word_dict)
+        print(word_dict)
         if first_match == False:
           i += len_of_sub
         else:
@@ -75,8 +78,8 @@ words = ["bar","foo","the"]
 # words = ["word","good","best","good"]
 # s = "lingmindraboofooowingdingbarrwingmonkeypoundcake"
 # words = ["fooo","barr","wing","ding","wing"]
-s = ""
-words = []
-s = "ababaab"
-words = ["ab","ba","ba"]
+# s = ""
+# words = []
+# s = "ababaab"
+# words = ["ab","ba","ba"]
 print(sol.findSubstring(s, words))
