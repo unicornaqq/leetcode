@@ -35,6 +35,7 @@ class Solution:
       original_copy = word_dict.copy()
       len_of_raw_string = len(s)
       len_of_sub = len(words[0])
+      len_of_words = len_of_sub * len(words)
       first_match = True
       temp = None
       i = 0
@@ -55,7 +56,8 @@ class Solution:
             temp = i
             first_match = False
           word_dict[word] -= 1
-          if all(word_dict[key] == 0 for key in word_dict.keys()):
+          # if all(word_dict[key] == 0 for key in word_dict.keys()):
+          if temp is not None and i + len_of_sub - temp == len_of_words:
             # one full match is found
             word_dict = original_copy.copy()
             first_match = True
@@ -91,4 +93,6 @@ words = ["bar","foo","the"]
 # words = []
 # s = "ababaab"
 # words = ["ab","ba","ba"]
+# s = "foobootooabctoofoobooabcfoofooabcfootoobooabctoofoobooabcfootoobooabcfootoobooabcfoofootooabctoofoofooabc"
+# words = ["foo", "boo", "too", "foo"]
 print(sol.findSubstring(s, words))
