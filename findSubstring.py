@@ -40,7 +40,6 @@ class Solution:
       temp = None
       i = 0
       while i <= (len_of_raw_string-len_of_sub):
-      # for i in range(0, len_of_raw_string-len_of_sub, len_of_sub):
         #print("i is {}".format(i))
         #print(s[i:len_of_sub+i])
         if word_dict.get(word := s[i:len_of_sub+i]) is not None:
@@ -57,16 +56,13 @@ class Solution:
             first_match = False
           i += len_of_sub
           word_dict[word] -= 1
-          # if all(word_dict[key] == 0 for key in word_dict.keys()):
           if temp is not None and i - temp == len_of_words:
             # one full match is found
             word_dict = original_copy.copy()
             first_match = True
             result.append(temp)
             # at the same time, we need to go back to find another potential match
-            i = temp
-            word_dict = original_copy.copy()
-            i += 1
+            i = temp + 1
         else:
           if first_match == False:
             word_dict = original_copy.copy()
@@ -75,7 +71,6 @@ class Solution:
               i = temp
               temp = None
           i += 1
-          # i = temp
         #print(word_dict)
 
       return result
