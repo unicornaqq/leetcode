@@ -25,7 +25,7 @@ profile = line_profiler.LineProfiler()
 atexit.register(profile.print_stats)
 
 class Solution:
-    # @profile
+    @profile
     def findSubstring(self, s: str, words):
       if len(s) == 0 or len(words) == 0:
         return []
@@ -43,7 +43,7 @@ class Solution:
       # for i in range(0, len_of_raw_string-len_of_sub, len_of_sub):
         #print("i is {}".format(i))
         #print(s[i:len_of_sub+i])
-        if (word := s[i:len_of_sub+i]) in words:
+        if word_dict.get(word := s[i:len_of_sub+i]) is not None:
           #print(word)
           # before -1 from the dict, it is 0 already, means, we should start a new match instance
           # please note, the offset should continue from previous offset.
@@ -81,8 +81,8 @@ class Solution:
       return result
       
 sol = Solution()
-s = "barfoofoobarthefoobarman"
-words = ["bar","foo","the"]
+# s = "barfoofoobarthefoobarman"
+# words = ["bar","foo","the"]
 # s = "wordgoodgoodgoodbestword"
 # words = ["word","good","best","good"]
 # s = "lingmindraboofooowingdingbarrwingmonkeypoundcake"
@@ -93,6 +93,6 @@ words = ["bar","foo","the"]
 # words = []
 # s = "ababaab"
 # words = ["ab","ba","ba"]
-# s = "foobootooabctoofoobooabcfoofooabcfootoobooabctoofoobooabcfootoobooabcfootoobooabcfoofootooabctoofoofooabc"
-# words = ["foo", "boo", "too", "foo"]
+s = "foobootooabctoofoobooabcfoofooabcfootoobooabctoofoobooabcfootoobooabcfootoobooabcfoofootooabctoofoofooabc"
+words = ["foo", "boo", "too", "foo"]
 print(sol.findSubstring(s, words))
