@@ -25,7 +25,7 @@ profile = line_profiler.LineProfiler()
 atexit.register(profile.print_stats)
 
 class Solution:
-    @profile
+    # @profile
     def findSubstring(self, s: str, words):
       if len(s) == 0 or len(words) == 0:
         return []
@@ -55,9 +55,10 @@ class Solution:
           if first_match == True:
             temp = i
             first_match = False
+          i += len_of_sub
           word_dict[word] -= 1
           # if all(word_dict[key] == 0 for key in word_dict.keys()):
-          if temp is not None and i + len_of_sub - temp == len_of_words:
+          if temp is not None and i - temp == len_of_words:
             # one full match is found
             word_dict = original_copy.copy()
             first_match = True
@@ -65,6 +66,7 @@ class Solution:
             # at the same time, we need to go back to find another potential match
             i = temp
             word_dict = original_copy.copy()
+            i += 1
         else:
           if first_match == False:
             word_dict = original_copy.copy()
@@ -72,12 +74,10 @@ class Solution:
             if temp != None:
               i = temp
               temp = None
+          i += 1
           # i = temp
         #print(word_dict)
-        if first_match == False:
-          i += len_of_sub
-        else:
-          i += 1
+
       return result
       
 sol = Solution()
