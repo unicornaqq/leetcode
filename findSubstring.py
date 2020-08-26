@@ -18,14 +18,20 @@ Input:
   words = ["word","good","best","word"]
 Output: [] """
 
-import json
+import line_profiler
+import atexit
+
+profile = line_profiler.LineProfiler()
+atexit.register(profile.print_stats)
+
 class Solution:
+    @profile
     def findSubstring(self, s: str, words):
       if len(s) == 0 or len(words) == 0:
         return []
       result = []
       word_dict = {word: words.count(word) for word in words}
-      print(word_dict)
+      #print(word_dict)
       original_copy = word_dict.copy()
       len_of_raw_string = len(s)
       len_of_sub = len(words[0])
@@ -34,10 +40,10 @@ class Solution:
       i = 0
       while i <= (len_of_raw_string-len_of_sub):
       # for i in range(0, len_of_raw_string-len_of_sub, len_of_sub):
-        print("i is {}".format(i))
-        print(s[i:len_of_sub+i])
+        #print("i is {}".format(i))
+        #print(s[i:len_of_sub+i])
         if (word := s[i:len_of_sub+i]) in words:
-          print(word)
+          #print(word)
           # before -1 from the dict, it is 0 already, means, we should start a new match instance
           # please note, the offset should continue from previous offset.
           if word_dict[word] == 0:
@@ -58,13 +64,14 @@ class Solution:
             i = temp
             word_dict = original_copy.copy()
         else:
-          word_dict = original_copy.copy()
-          first_match = True
-          if temp != None:
-            i = temp
-            temp = None
+          if first_match == False:
+            word_dict = original_copy.copy()
+            first_match = True
+            if temp != None:
+              i = temp
+              temp = None
           # i = temp
-        print(word_dict)
+        #print(word_dict)
         if first_match == False:
           i += len_of_sub
         else:
@@ -78,6 +85,8 @@ words = ["bar","foo","the"]
 # words = ["word","good","best","good"]
 # s = "lingmindraboofooowingdingbarrwingmonkeypoundcake"
 # words = ["fooo","barr","wing","ding","wing"]
+# s = "fooobarrwingpoleiekdppolnkojielpkoijnmjuyhiklingmindraboofooowingdingbarrwingmonkeypoundcakefooowingdingwingbarroplolpplfooowinglloeoekepplowingwingdingbarrfooo"
+# words = ["fooo","barr","wing","jiel","pkoi","boof","ooow"]
 # s = ""
 # words = []
 # s = "ababaab"
