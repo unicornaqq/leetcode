@@ -30,6 +30,15 @@ And we need to take into the consideration the case that we need to connect the 
 when poping out the (, this helps to connect to remote long string.
 
  """
+ 
+ 
+ 
+import line_profiler
+import atexit
+
+profile = line_profiler.LineProfiler()
+atexit.register(profile.print_stats)
+
 class StackElement:
     def __init__(self, value, next=None):
         self.val = value
@@ -55,6 +64,7 @@ class Stack:
         return self.top == None
 
 class Solution:
+    @profile
     def longestValidParentheses(self, s: str) -> int:
         temp_stack = Stack()
         prev_index = 0
@@ -87,7 +97,7 @@ class Solution:
                 else:
                     prev_index = 0
                     prev_len = 0
-        print(s[(max_index-max_len+1):(max_index+1)])
+        # print(s[(max_index-max_len+1):(max_index+1)])
         return max_len
     
 sol = Solution()
@@ -101,9 +111,5 @@ s = ")()())"
 # s = "()(((((())"
 # s = "((())))()(()())()()()()(((())))))(()()()()()()((((((())))"
 # s = "()(()())"
-s = "((((((())))(((((())))))(())((((())))()((((((((((((((())()))))))(()))()()(((((((())))))))))(((((()))))))(((((((((((((((((()))))))))))))))))))))))))))))))))))((()))())())())()))))))))))))))"
+s = "((((((())))(((((())))))(())((((())))()((((((((()()()(((())()()(((((()))))()()())())))))((((()()()))((((((()))())(((((((())()))))))(()))()()(((((((())))))))))(((((()))))))(((((((((((((((((()))))))))))))))))))))))))))))))))))((()))())())())()))))))))))))))"
 print(sol.longestValidParentheses(s))
-
-# the current solution can't handle the case as : ()(()())
-# create a special element (position_of_( and prev_index) and push it into the stack
-# once we pop the (, we can use this special element to check if we need to add the prev_len into the current len
