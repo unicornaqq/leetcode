@@ -50,30 +50,29 @@ The given board size is always 9x9.
 Need a command function to check if upto 9 digits are unique.
 
 """
+import line_profiler
+import atexit
 
+profile = line_profiler.LineProfiler()
+atexit.register(profile.print_stats)
 # import numpy as np
 class Solution:
-  def check_dup_from_9_elements(self, list):
-    temp_dict = dict()
-    for ele in list:
-      if ele != '.':
-        if temp_dict.get(ele) != None:
-          return False
-        else:
-          temp_dict[ele] = True
-    return True
-  
+  @profile
   def isValidSudoku(self, board) -> bool:
     for j in board:
-      if self.check_dup_from_9_elements(j) == False:
+      # if self.check_dup_from_9_elements(j) == False:
+      #   return False
+      temp_list = list(filter(lambda a: a != '.', j))
+      if len(temp_list) != len(set(temp_list)):
         return False
     
     transposed = zip(*board) # this is really a good way to transpos a 2nd array
     for i in transposed:
-      if self.check_dup_from_9_elements(i) == False:
+      temp_list = list(filter(lambda a: a != '.', list(i)))
+      if len(temp_list) != len(set(temp_list)):
         return False
     
-    for board_index in range(len(board[0])):
+    for board_index in range(9):
       #print(index)
       #find out each small sub-box
       box_to_list = []
@@ -81,7 +80,8 @@ class Solution:
       board_col_index = (board_index % 3)*3
       # print([board_row_index, board_col_index])
       box_to_list = board[board_row_index][board_col_index:board_col_index+3] + board[board_row_index+1][board_col_index:board_col_index+3] + board[board_row_index+2][board_col_index:board_col_index+3]
-      if self.check_dup_from_9_elements(box_to_list) == False:
+      temp_list = list(filter(lambda a: a != '.', box_to_list))
+      if len(temp_list) != len(set(temp_list)):
         return False
     return True
 
