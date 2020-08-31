@@ -51,11 +51,40 @@ Need a command function to check if upto 9 digits are unique.
 
 """
 
-import numpy as np
+# import numpy as np
 class Solution:
-    def isValidSudoku(self, board) -> bool:
-        a = np.array(board)
-        print(a)
+  def check_dup_from_9_elements(self, list):
+    temp_dict = dict()
+    for ele in list:
+      if ele != '.':
+        if temp_dict.get(ele) != None:
+          return False
+        else:
+          temp_dict[ele] = True
+    return True
+  
+  def isValidSudoku(self, board) -> bool:
+    for j in board:
+      if self.check_dup_from_9_elements(j) == False:
+        return False
+    
+    transposed = zip(*board) # this is really a good way to transpos a 2nd array
+    for i in transposed:
+      if self.check_dup_from_9_elements(i) == False:
+        return False
+    
+    for board_index in range(len(board[0])):
+      #print(index)
+      #find out each small sub-box
+      box_to_list = []
+      board_row_index = (board_index // 3)*3
+      board_col_index = (board_index % 3)*3
+      # print([board_row_index, board_col_index])
+      box_to_list = board[board_row_index][board_col_index:board_col_index+3] + board[board_row_index+1][board_col_index:board_col_index+3] + board[board_row_index+2][board_col_index:board_col_index+3]
+      if self.check_dup_from_9_elements(box_to_list) == False:
+        return False
+    return True
+
 
 sol = Solution()
 board = [
