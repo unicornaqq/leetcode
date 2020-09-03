@@ -30,7 +30,7 @@ atexit.register(profile.print_stats)
 
 import pprint
 class Solution:
-    @profile
+    #@profile
     def safeToAssign(self, board, row, col, num):
       # check if it is safe to insert into the cell at [row][col].
       # the checking rule is it shouldn't introduce multiple number instance in the same row/col/box
@@ -42,15 +42,15 @@ class Solution:
                    board[small_box_row+2][small_box_col:small_box_col+3]))
       return False
 
-    @profile
-    def recurSolve(self, board):
+    #@profile
+    def recurSolve(self, board, row, col):
       # find unassinged cells,
       # if no cell is empty, we are done, print the new soduku and return True.
       # if still have cell that is empty:
       #   check if the cell is safe to insert with num
       #       if not safe, meaning it will cause conflict, we should return False - backtracking to the parent level on the search tree
       #       if safe, just assign this value and recursive search the solution
-      [row, col] = self.findUnassigned(board)
+      [row, col] = self.findUnassigned(board, row, col)
       # print("find empty cell {} {}".format(row, col))
       if row is not None:
         # we found one unassigned cell
@@ -59,26 +59,31 @@ class Solution:
           if self.safeToAssign(board, row, col, str(num)):
             board[row][col] = str(num)
             # pprint.pprint(board)
-            if self.recurSolve(board) == False:
+            if self.recurSolve(board, row, col) == False:
               board[row][col] = '.'
               # pprint.pprint(board)
             else:
               return True
         return False
-    @profile
-    def findUnassigned(self, board):
-      for row in range(0, 9):
-        for col in range(0, 9):
-          if board[row][col] == '.':
-            return [row, col]
-      return [None, None] # means no unassigned cell.
+    #@profile
+    def findUnassigned(self, board, row, col):
+      if col == 9:
+        col = 0
+        row = row + 1
+      if col == 0 and row == 9:
+        return [None, None]
+      if board[row][col] == '.':
+        return [row, col]
+      else:
+        return self.findUnassigned(board, row, col+1)
+      # return [None, None] # means no unassigned cell.
     
-    @profile
+    #@profile
     def solveSudoku(self, board) -> None:
         """
         Do not return anything, modify board in-place instead.
         """
-        self.recurSolve(board)
+        self.recurSolve(board, 0, 0)
         # print("solved")
         
 
@@ -94,5 +99,16 @@ board = [
   [".",".",".","4","1","9",".",".","5"],
   [".",".",".",".","8",".",".","7","9"]
 ]
+
+board = [[".",".","9","7","4","8",".",".","."],
+  ["7",".",".",".",".",".",".",".","."],
+  [".","2",".","1",".","9",".",".","."],
+  [".",".","7",".",".",".","2","4","."],
+  [".","6","4",".","1",".","5","9","."],
+  [".","9","8",".",".",".","3",".","."],
+  [".",".",".","8",".","3",".","2","."],
+  [".",".",".",".",".",".",".",".","6"],
+  [".",".",".","2","7","5","9",".","."]]
+
 sol.solveSudoku(board)
 pprint.pprint(board)
