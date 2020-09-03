@@ -67,16 +67,17 @@ class Solution:
         return False
     #@profile
     def findUnassigned(self, board, row, col):
-      if col == 9:
-        col = 0
-        row = row + 1
-      if col == 0 and row == 9:
-        return [None, None]
       if board[row][col] == '.':
         return [row, col]
       else:
-        return self.findUnassigned(board, row, col+1)
-      # return [None, None] # means no unassigned cell.
+        while row < 9:
+          col = col + 1
+          if col == 9:
+            col = 0
+            row = row + 1
+          if row < 9 and board[row][col] == '.':
+            return [row, col]
+      return [None, None]
     
     #@profile
     def solveSudoku(self, board) -> None:
