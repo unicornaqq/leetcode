@@ -20,12 +20,57 @@ You may assume that the given Sudoku puzzle will have a single unique solution.
 The given board size is always 9x9.
  """
 
+import pprint
 class Solution:
-    def solveSudoku(self, board: List[List[str]]) -> None:
+    def safeToAssign(self, board, row, col, num):
+      # check if it is safe to insert into the cell at [row][col].
+      # the checking rule is it shouldn't introduce multiple number instance in the same row/col/box
+      small_box_row = row // 3 * 3
+      small_box_col = col // 3 * 3
+      small_box = (board[small_box_row][small_box_col:small_box_col+3] + 
+                   board[small_box_row+1][small_box_col:small_box_col+3] +
+                   board[small_box_row+2][small_box_col:small_box_col+3])
+      # print(small_box) 
+      return ((num not in board[row]) and 
+              (num not in list(zip(*board))[col]) and 
+              (num not in small_box))
+    def recurSolve(self, board):
+      # find unassinged cells,
+      # if no cell is empty, we are done, print the new soduku and return True.
+      # if still have cell that is empty:
+      #   check if the cell is safe to insert with num
+      #       if not safe, meaning it will cause conflict, we should return False - backtracking to the parent level on the search tree
+      #       if safe, just assign this value and recursive search the solution
+      [row, col] = self.findUnassigned(board)
+      # print("find empty cell {} {}".format(row, col))
+      if row is not None:
+        # we found one unassigned cell
+        for num in range(1, 10):
+          # print("trying num {}".format(num))
+          if self.safeToAssign(board, row, col, str(num)):
+            board[row][col] = str(num)
+            # pprint.pprint(board)
+            if self.recurSolve(board) == False:
+              board[row][col] = '.'
+              # pprint.pprint(board)
+            else:
+              return True
+        return False
+
+    def findUnassigned(self, board):
+      for row in range(0, 9):
+        for col in range(0, 9):
+          if board[row][col] == '.':
+            return [row, col]
+      return [None, None] # means no unassigned cell.
+    
+    def solveSudoku(self, board) -> None:
         """
         Do not return anything, modify board in-place instead.
         """
-        print("solved")
+        self.recurSolve(board)
+        # print("solved")
+        
 
 sol = Solution()
 board = [
@@ -40,4 +85,4 @@ board = [
   [".",".",".",".","8",".",".","7","9"]
 ]
 sol.solveSudoku(board)
-print(board)
+pprint.pprint(board)
