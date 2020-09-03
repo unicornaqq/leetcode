@@ -20,20 +20,32 @@ You may assume that the given Sudoku puzzle will have a single unique solution.
 The given board size is always 9x9.
  """
 
+[current_row, current_col] = [None, None]
+
+import line_profiler
+import atexit
+
+profile = line_profiler.LineProfiler()
+atexit.register(profile.print_stats)
+
 import pprint
 class Solution:
+    @profile
     def safeToAssign(self, board, row, col, num):
       # check if it is safe to insert into the cell at [row][col].
       # the checking rule is it shouldn't introduce multiple number instance in the same row/col/box
       small_box_row = row // 3 * 3
       small_box_col = col // 3 * 3
-      small_box = (board[small_box_row][small_box_col:small_box_col+3] + 
-                   board[small_box_row+1][small_box_col:small_box_col+3] +
-                   board[small_box_row+2][small_box_col:small_box_col+3])
+      # small_box = (board[small_box_row][small_box_col:small_box_col+3] + 
+      #              board[small_box_row+1][small_box_col:small_box_col+3] +
+      #              board[small_box_row+2][small_box_col:small_box_col+3])
       # print(small_box) 
       return ((num not in board[row]) and 
               (num not in list(zip(*board))[col]) and 
-              (num not in small_box))
+              (num not in (board[small_box_row][small_box_col:small_box_col+3] + 
+                   board[small_box_row+1][small_box_col:small_box_col+3] +
+                   board[small_box_row+2][small_box_col:small_box_col+3])))
+    @profile
     def recurSolve(self, board):
       # find unassinged cells,
       # if no cell is empty, we are done, print the new soduku and return True.
@@ -56,7 +68,7 @@ class Solution:
             else:
               return True
         return False
-
+    @profile
     def findUnassigned(self, board):
       for row in range(0, 9):
         for col in range(0, 9):
@@ -64,6 +76,7 @@ class Solution:
             return [row, col]
       return [None, None] # means no unassigned cell.
     
+    @profile
     def solveSudoku(self, board) -> None:
         """
         Do not return anything, modify board in-place instead.
