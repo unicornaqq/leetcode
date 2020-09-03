@@ -34,17 +34,14 @@ class Solution:
     def safeToAssign(self, board, row, col, num):
       # check if it is safe to insert into the cell at [row][col].
       # the checking rule is it shouldn't introduce multiple number instance in the same row/col/box
-      small_box_row = row // 3 * 3
-      small_box_col = col // 3 * 3
-      # small_box = (board[small_box_row][small_box_col:small_box_col+3] + 
-      #              board[small_box_row+1][small_box_col:small_box_col+3] +
-      #              board[small_box_row+2][small_box_col:small_box_col+3])
-      # print(small_box) 
-      return ((num not in board[row]) and 
-              (num not in list(zip(*board))[col]) and 
-              (num not in (board[small_box_row][small_box_col:small_box_col+3] + 
+      if (num not in board[row] and num not in list(zip(*board))[col]):
+        small_box_row = row // 3 * 3
+        small_box_col = col // 3 * 3
+        return (num not in (board[small_box_row][small_box_col:small_box_col+3] + 
                    board[small_box_row+1][small_box_col:small_box_col+3] +
-                   board[small_box_row+2][small_box_col:small_box_col+3])))
+                   board[small_box_row+2][small_box_col:small_box_col+3]))
+      return False
+
     @profile
     def recurSolve(self, board):
       # find unassinged cells,
